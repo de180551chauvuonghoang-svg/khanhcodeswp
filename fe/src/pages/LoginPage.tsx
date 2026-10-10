@@ -25,7 +25,10 @@ export default function LoginPage() {
   );
   const showGoogleError = useCallback((message: string) => setError(message), []);
 
-  if (user) return <Navigate to="/profile" replace />;
+  if (user) {
+    const isAdmin = (user.role || "").toLowerCase() === "systemadmin";
+    return <Navigate to={isAdmin ? "/admin" : "/profile"} replace />;
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
