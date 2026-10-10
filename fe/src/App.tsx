@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./app/AuthProvider";
 import AuthLayout from "./layouts/AuthLayout";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -32,7 +32,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/" element={<HomeRedirect />} />
