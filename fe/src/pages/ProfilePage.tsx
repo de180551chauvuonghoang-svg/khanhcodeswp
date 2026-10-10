@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../app/AuthProvider";
 import Brand from "../components/Brand";
 import Feedback from "../components/Feedback";
@@ -75,14 +75,21 @@ export default function ProfilePage() {
     <main className="profile-page">
       <header className="profile-header">
         <Brand compact />
-        <button
-          className="button button-quiet"
-          onClick={() => void handleLogout()}
-          disabled={isLoggingOut}
-        >
-          {isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
-          <span aria-hidden="true">↗</span>
-        </button>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {(user.role || "").toLowerCase() === "systemadmin" && (
+            <Link to="/admin" className="button button-secondary" style={{ padding: "8px 14px", fontSize: "0.85rem" }}>
+              Trang Quản trị ⚙️
+            </Link>
+          )}
+          <button
+            className="button button-quiet"
+            onClick={() => void handleLogout()}
+            disabled={isLoggingOut}
+          >
+            {isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+            <span aria-hidden="true">↗</span>
+          </button>
+        </div>
       </header>
       <div className="profile-content">
         <div className="profile-intro">
