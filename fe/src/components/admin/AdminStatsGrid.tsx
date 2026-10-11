@@ -5,33 +5,71 @@ interface AdminStatsGridProps {
 }
 
 export default function AdminStatsGrid({ stats }: AdminStatsGridProps) {
+  const activePercent =
+    stats && stats.totalUsers > 0
+      ? Math.round((stats.activeUsers / stats.totalUsers) * 100)
+      : 100;
+
   return (
     <section className="admin-metrics-grid">
-      <div className="admin-metric-card">
-        <span className="metric-title">Tổng số tài khoản</span>
-        <span className="metric-value">{stats ? stats.totalUsers : "--"}</span>
-        <span className="metric-sub">Đã đăng ký trong cơ sở dữ liệu</span>
+      {/* Metric 1: Total Users */}
+      <div className="admin-metric-card metric-card-total">
+        <div className="metric-header">
+          <span className="metric-title">Tổng số tài khoản</span>
+          <div className="metric-icon-box icon-total">👥</div>
+        </div>
+        <div className="metric-body">
+          <span className="metric-value">{stats ? stats.totalUsers : "--"}</span>
+          <span className="metric-pill pill-neutral">Đã lưu trữ DB</span>
+        </div>
+        <span className="metric-sub">Tất cả người dùng trong hệ thống</span>
       </div>
-      <div className="admin-metric-card">
-        <span className="metric-title">Tài khoản hoạt động</span>
-        <span className="metric-value is-success">
-          {stats ? stats.activeUsers : "--"}
-        </span>
-        <span className="metric-sub">Trạng thái active</span>
+
+      {/* Metric 2: Active Users */}
+      <div className="admin-metric-card metric-card-active">
+        <div className="metric-header">
+          <span className="metric-title">Đang hoạt động</span>
+          <div className="metric-icon-box icon-active">⚡</div>
+        </div>
+        <div className="metric-body">
+          <span className="metric-value is-success">
+            {stats ? stats.activeUsers : "--"}
+          </span>
+          <span className="metric-pill pill-success">{activePercent}% khả dụng</span>
+        </div>
+        <span className="metric-sub">Tài khoản ở trạng thái Active</span>
       </div>
-      <div className="admin-metric-card">
-        <span className="metric-title">Tài khoản quản trị</span>
-        <span className="metric-value is-accent">
-          {stats ? stats.adminCount : "--"}
-        </span>
-        <span className="metric-sub">Role Systemadmin</span>
+
+      {/* Metric 3: System Admins */}
+      <div className="admin-metric-card metric-card-admin">
+        <div className="metric-header">
+          <span className="metric-title">Quản trị viên</span>
+          <div className="metric-icon-box icon-admin">🛡️</div>
+        </div>
+        <div className="metric-body">
+          <span className="metric-value is-accent">
+            {stats ? stats.adminCount : "--"}
+          </span>
+          <span className="metric-pill pill-accent">Systemadmin</span>
+        </div>
+        <span className="metric-sub">Được cấp quyền quản trị tối cao</span>
       </div>
-      <div className="admin-metric-card">
-        <span className="metric-title">Tài khoản bị khóa</span>
-        <span className="metric-value is-muted">
-          {stats ? stats.inactiveUsers : "--"}
-        </span>
-        <span className="metric-sub">Chưa kích hoạt hoặc blocked</span>
+
+      {/* Metric 4: Blocked / Inactive */}
+      <div className="admin-metric-card metric-card-blocked">
+        <div className="metric-header">
+          <span className="metric-title">Bị khóa / Tạm dừng</span>
+          <div className="metric-icon-box icon-blocked">🔒</div>
+        </div>
+        <div className="metric-body">
+          <span className="metric-value is-muted">
+            {stats ? stats.inactiveUsers : "--"}
+          </span>
+          <span className="metric-pill pill-muted">
+            {stats && stats.inactiveUsers > 0 ? "Cần chú ý" : "An toàn"}
+          </span>
+        </div>
+        <span className="metric-sub">Tài khoản bị hạn chế truy cập</span>
       </div>
     </section>
   );

@@ -5,61 +5,109 @@ import Brand from "../Brand";
 interface AdminSidebarProps {
   activeTab: "overview" | "users";
   setActiveTab: (tab: "overview" | "users") => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export default function AdminSidebar({
   activeTab,
   setActiveTab,
+  isOpen = false,
+  onClose,
 }: AdminSidebarProps) {
   const { user, signOut } = useAuth();
 
+  const handleNavClick = (tab: "overview" | "users") => {
+    setActiveTab(tab);
+    if (onClose) onClose();
+  };
+
   return (
-    <aside className="admin-sidebar">
-      <div className="admin-sidebar-header">
-        <Brand compact />
-        <span className="admin-badge-portal">SYSTEM ADMIN</span>
-      </div>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="admin-sidebar-backdrop"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
 
-      <div className="admin-current-user">
-        <div className="admin-user-avatar">
-          {(user?.name || "A").slice(0, 2).toUpperCase()}
+      <aside className={`admin-sidebar ${isOpen ? "is-open" : ""}`}>
+        <div className="admin-sidebar-header">
+          <div className="admin-sidebar-brand-wrap">
+            <Brand compact />
+            <span className="admin-badge-portal">SYSTEM ADMIN</span>
+          </div>
+
+          {/* Close button on mobile */}
+          <button
+            className="admin-sidebar-close-btn"
+            onClick={onClose}
+            aria-label="Đóng menu"
+          >
+            ✕
+          </button>
         </div>
-        <div className="admin-user-info">
-          <span className="admin-user-name">{user?.name}</span>
-          <span className="admin-user-email">{user?.email}</span>
-          <span className="admin-user-role-badge">{user?.role}</span>
+
+        {/* Current Admin Profile Card */}
+        <div className="admin-current-user">
+          <div className="admin-user-avatar">
+            {(user?.name || "A").slice(0, 2).toUpperCase()}
+          </div>
+          <div className="admin-user-info">
+            <span className="admin-user-name" title={user?.name}>
+              {user?.name}
+            </span>
+            <span className="admin-user-email" title={user?.email}>
+              {user?.email}
+            </span>
+            <span className="admin-user-role-badge">
+              🛡️ {user?.role || "Systemadmin"}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <nav className="admin-nav">
-        <button
-          className={`admin-nav-item ${activeTab === "users" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("users")}
-        >
-          <span className="admin-nav-icon">👥</span>
-          <span>Quản lý người dùng</span>
-        </button>
-        <button
-          className={`admin-nav-item ${activeTab === "overview" ? "is-active" : ""}`}
-          onClick={() => setActiveTab("overview")}
-        >
-          <span className="admin-nav-icon">📊</span>
-          <span>Chỉ số hệ thống</span>
-        </button>
-        <Link to="/profile" className="admin-nav-item">
-          <span className="admin-nav-icon">👤</span>
-          <span>Hồ sơ cá nhân</span>
-        </Link>
-      </nav>
+        {/* Navigation items */}
+        <nav className="admin-nav">
+          <div className="admin-nav-section-label">QUẢN TRỊ</div>
+          <button
+            className={`admin-nav-item ${activeTab === "users" ? "is-active" : ""}`}
+            onClick={() => handleNavClick("users")}
+          >
+            <span className="admin-nav-icon">👥</span>
+            <span className="admin-nav-label">Quản lý người dùng</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === "overview" ? "is-active" : ""}`}
+            onClick={() => handleNavClick("overview")}
+          >
+            <span className="admin-nav-icon">📊</span>
+            <span className="admin-nav-label">Chỉ số hệ thống</span>
+          </button>
 
-      <div className="admin-sidebar-footer">
-        <button
-          className="button button-quiet admin-logout-btn"
-          onClick={() => void signOut()}
-        >
-          Đăng xuất <span>↗</span>
-        </button>
-      </div>
-    </aside>
+          <div className="admin-nav-section-label">CÁ NHÂN</div>
+          <Link
+            to="/profile"
+            className="admin-nav-item"
+            onClick={onClose}
+          >
+            <span className="admin-nav-icon">👤</span>
+            <span className="admin-nav-label">Hồ sơ của tôi</span>
+          </Link>
+        </nav>
+
+        {/* Sidebar Footer with Logout */}
+        <div className="admin-sidebar-footer">
+          <button
+            className="button button-quiet admin-logout-btn"
+            onClick={() => void signOut()}
+          >
+            <span>Đăng xuất</span>
+            <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
