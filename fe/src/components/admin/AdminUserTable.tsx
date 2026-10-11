@@ -88,7 +88,6 @@ export default function AdminUserTable({
               <th>Mã ID</th>
               <th>Vai trò</th>
               <th>Trạng thái</th>
-              <th>Điểm tin cậy</th>
               <th>Ngày tạo</th>
               <th className="th-actions">Thao tác</th>
             </tr>
@@ -96,7 +95,7 @@ export default function AdminUserTable({
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={7} className="admin-table-empty">
+                <td colSpan={6} className="admin-table-empty">
                   {isLoading ? (
                     <div className="table-loading-spinner">Đang tải dữ liệu...</div>
                   ) : (
@@ -153,9 +152,6 @@ export default function AdminUserTable({
                         <span className="status-indicator-dot"></span>
                         {u.status === "active" ? "Hoạt động" : "Bị khóa"}
                       </span>
-                    </td>
-                    <td>
-                      <span className="trust-score">{u.trust_score ?? 0}</span>
                     </td>
                     <td>
                       <span className="date-cell">
