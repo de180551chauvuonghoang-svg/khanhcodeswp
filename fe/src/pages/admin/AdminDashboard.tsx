@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../../app/AuthProvider";
 import Feedback from "../../components/Feedback";
+import Brand from "../../components/Brand";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import AdminStatsGrid from "../../components/admin/AdminStatsGrid";
 import AdminUserTable, { type AdminUserRow } from "../../components/admin/AdminUserTable";
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [activeTab, setActiveTab] = useState<"overview" | "users">("users");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -108,54 +110,119 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-layout">
-      {/* Admin Sidebar Navigation */}
-      <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* Admin Mobile App Bar (< 1024px) */}
+      <header className="admin-mobile-header">
+        <button
+          className="admin-hamburger-btn"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Mở menu quản trị"
+        >
+          <span className="hamburger-bar"></span>
+          <span className="hamburger-bar"></span>
+          <span className="hamburger-bar"></span>
+        </button>
 
-      {/* Main Admin Area */}
+        <div className="admin-mobile-brand">
+          <Brand compact />
+        </div>
+
+        <div className="admin-mobile-avatar">
+          {(user?.name || "A").slice(0, 1).toUpperCase()}
+        </div>
+      </header>
+
+      {/* Admin Sidebar / Mobile Drawer */}
+      <AdminSidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {/* Main Admin Content Container */}
       <main className="admin-main">
-        {/* Top Navbar */}
+        {/* Desktop Topbar */}
         <header className="admin-topbar">
-          <div>
+          <div className="admin-topbar-info">
             <span className="form-kicker">KHÔNG GIAN QUẢN TRỊ VIÊN</span>
-            <h1 className="admin-page-title">Bảng điều khiển System Admin</h1>
+            <h1 className="admin-page-title">
+              {activeTab === "users" ? "Quản lý người dùng" : "Chỉ số toàn hệ thống"}
+            </h1>
+            <p className="admin-topbar-desc">
+              Chào mừng, <strong>{user?.name}</strong>. Giám sát tài khoản và toàn quyền kiểm soát cơ sở dữ liệu.
+            </p>
           </div>
+
           <div className="admin-topbar-actions">
             <div className="admin-status-pill">
               <span className="status-dot"></span>
               <span>Hệ thống Online</span>
             </div>
             <button
-              className="button button-secondary button-compact"
+              className="button button-secondary button-compact refresh-button"
               onClick={loadData}
               disabled={isLoading}
+              title="Tải lại dữ liệu mới nhất"
             >
-              {isLoading ? "Đang tải..." : "Làm mới dữ liệu ⟳"}
+              <span className={`refresh-icon ${isLoading ? "is-spinning" : ""}`}>⟳</span>
+              <span>{isLoading ? "Đang đồng bộ..." : "Làm mới dữ liệu"}</span>
             </button>
           </div>
         </header>
 
-        {/* Feedback Messages */}
+        {/* Feedback Alerts */}
         <div className="admin-feedbacks">
           <Feedback message={error} />
           <Feedback message={success} type="success" />
         </div>
 
-        {/* System KPI Metrics Grid */}
+        {/* KPI Metrics Summary Grid */}
         <AdminStatsGrid stats={stats} />
 
-        {/* System Users Table */}
-        <AdminUserTable
-          users={filteredUsers}
-          currentAdminEmail={user?.email}
-          isLoading={isLoading}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          roleFilter={roleFilter}
-          setRoleFilter={setRoleFilter}
-          updatingId={updatingId}
-          onToggleRole={handleToggleRole}
-          onToggleStatus={handleToggleStatus}
-        />
+        {/* Users Management Section */}
+        {activeTab === "users" ? (
+          <AdminUserTable
+            users={filteredUsers}
+            totalCount={users.length}
+            currentAdminEmail={user?.email}
+            isLoading={isLoading}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            roleFilter={roleFilter}
+            setRoleFilter={setRoleFilter}
+            updatingId={updatingId}
+            onToggleRole={handleToggleRole}
+            onToggleStatus={handleToggleStatus}
+          />
+        ) : (
+          /* System Overview Tab */
+          <section className="admin-card admin-overview-card">
+            <div className="admin-card-header">
+              <div>
+                <h2>Chi tiết vận hành hệ thống</h2>
+                <p>Thông tin kiến trúc máy chủ và cơ sở dữ liệu kết nối.</p>
+              </div>
+            </div>
+            <div className="overview-details-grid">
+              <div className="overview-detail-item">
+                <span className="detail-item-label">Cơ sở dữ liệu:</span>
+                <span className="detail-item-value">MongoDB Atlas (NoSQL)</span>
+              </div>
+              <div className="overview-detail-item">
+                <span className="detail-item-label">Xác thực:</span>
+                <span className="detail-item-value">JSON Web Token + Token Version Revocation</span>
+              </div>
+              <div className="overview-detail-item">
+                <span className="detail-item-label">Bảo mật mật khẩu:</span>
+                <span className="detail-item-value">Bcrypt (12 Salt Rounds)</span>
+              </div>
+              <div className="overview-detail-item">
+                <span className="detail-item-label">Phân quyền:</span>
+                <span className="detail-item-value">RBAC (Systemadmin, User)</span>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
